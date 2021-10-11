@@ -48,6 +48,12 @@ void Drob::Cancellation() {
 	}	
 }
 
+//Drob::operator double()
+//{
+//	double res = (intPart * denominator + numerator) /	denominator;
+//	return res;
+//}
+
 Drob Drob::operator + (Drob a) const {
 	Drob res;
 	res.numerator = (intPart * denominator + numerator) * a.denominator +
@@ -85,27 +91,60 @@ Drob Drob::operator/ (Drob a) const {
 	return res;
 }
 
-Drob Drob::operator< (Drob a) const {
-	bool comp;
-	if (denominator == a.denominator) {
-			
+bool Drob::operator < (Drob a) const {
+	Drob temp;
+	temp.numerator = (intPart * this->denominator + this->numerator) * a.denominator -
+			(a.intPart * a.denominator + a.denominator) * this->denominator;
+	temp.denominator = this->denominator * a.denominator;
+	temp.GetMixedView();
+		if (temp.numerator < 0) {
+			return true;
+		}	
+	return false;
+}
+
+bool Drob::operator > (Drob a) const {
+	Drob temp;
+	temp.numerator = (intPart * this->denominator + this->numerator) * a.denominator -
+		(a.intPart * a.denominator + a.denominator) * this->denominator;
+	temp.denominator = this->denominator * a.denominator;
+	temp.GetMixedView();
+	if (temp.numerator > 0) {
+		return true;
 	}
+	return false;
 }
 
-Drob Drob::operator> (Drob a) const {
-
+bool Drob::operator == (Drob a) const {
+	if (intPart != a.intPart || numerator * a.denominator != denominator * a.numerator)
+		return false;
+	return true;
 }
 
-Drob Drob::operator==(Drob a) const {
-
+bool Drob::operator != (Drob a) const {
+	if (intPart == a.intPart &&	numerator * a.denominator == denominator * a.numerator)
+		return false;
+	return true;
 }
 
-Drob Drob::operator++(int a) const {
-
+Drob Drob::operator ++ (int a) const {
+	a = 1;
+	Drob b(a, a);
+	Drob res;
+	res = (*this + b);
+	res.GetIntPart();
+	res.GetMixedView();
+	return res;
 }
 
-Drob Drob::operator--(int a) const {
-
+Drob Drob::operator -- (int a) const {
+	a = 1;
+	Drob b(a, a);
+	Drob res;
+	res = (*this - b);
+	res.GetIntPart();
+	res.GetMixedView();
+	return res;
 }
 
 ostream& operator << (ostream& out, const Drob& a) {
@@ -130,18 +169,11 @@ istream& operator >> (istream& fin, Drob& a) {
 	}
 	else {
 		fin >> znam;
-	}
+	}	
 	a.numerator = chisl;
 	a.denominator = znam;
-	//char buf[30];
-	//if (typeid(istream) == typeid(fin))
-	//	fin.getline(buf, 29, '\t');
-	//else
-	//	fin.getline(buf, 29);
-	//char* ps = strchr(buf, '/');
-	//if (ps == NULL)
-	//	//sscanf(buf, "%d", a.intPart);
-	//a.numerator = 0;
-	//a.denominator = 1;
+	a.GetMixedView();
+	a.GetIntPart();
+	a.Cancellation();
 	return fin;
 }
